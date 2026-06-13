@@ -129,6 +129,16 @@ export async function deleteRecipe(id: string): Promise<void> {
   if (error) throw error;
 }
 
+// Full export for backup (admin). Returns every readable recipe row.
+export async function fetchAllRecipes(): Promise<Recipe[]> {
+  const { data, error } = await supabase
+    .from('recipes')
+    .select('*')
+    .order('created_at', { ascending: true });
+  if (error) throw error;
+  return (data ?? []) as Recipe[];
+}
+
 export interface Facets {
   courses: string[]; // ordered by COURSES
   cuisines: string[];
