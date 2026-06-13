@@ -1,33 +1,16 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Check } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
-  const [email, setEmail] = useState('');
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [busy, setBusy] = useState(false);
   const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (user) navigate('/', { replace: true });
   }, [user, navigate]);
-
-  async function sendLink(e: React.FormEvent) {
-    e.preventDefault();
-    setBusy(true);
-    setError(null);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: window.location.origin },
-    });
-    setBusy(false);
-    if (error) setError(error.message);
-    else setSent(true);
-  }
 
   async function signInWithGoogle() {
     setError(null);
@@ -46,56 +29,15 @@ export default function Login() {
         Sign in to browse the collection and add your own recipes.
       </p>
 
-      {sent ? (
-        <div className="mt-8 flex w-full flex-col items-center gap-3 rounded-2xl border border-line bg-paper p-8 text-center">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-sage/20 text-sage">
-            <Check />
-          </span>
-          <p className="font-semibold">Check your email</p>
-          <p className="text-sm text-muted">
-            We sent a magic sign-in link to <strong>{email}</strong>.
-          </p>
-        </div>
-      ) : (
-        <div className="mt-8 w-full space-y-4">
-          <button
-            type="button"
-            onClick={signInWithGoogle}
-            className="flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-paper py-3 font-semibold text-ink transition hover:bg-cream"
-          >
-            <GoogleIcon />
-            Continue with Google
-          </button>
-
-          <div className="flex items-center gap-3 text-xs text-muted">
-            <span className="h-px flex-1 bg-line" />
-            or
-            <span className="h-px flex-1 bg-line" />
-          </div>
-
-          <form onSubmit={sendLink} className="space-y-3">
-          <div className="flex items-center gap-2 rounded-xl border border-line bg-paper px-3">
-            <Mail size={18} className="text-muted" />
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@example.com"
-              className="w-full bg-transparent py-3 outline-none"
-            />
-          </div>
-          {error && <p className="text-sm text-terracotta-dark">{error}</p>}
-          <button
-            type="submit"
-            disabled={busy}
-            className="w-full rounded-xl bg-terracotta py-3 font-semibold text-paper transition hover:bg-terracotta-dark disabled:opacity-60"
-          >
-            {busy ? 'Sending…' : 'Email me a magic link'}
-          </button>
-          </form>
-        </div>
-      )}
+      <button
+        type="button"
+        onClick={signInWithGoogle}
+        className="mt-8 flex w-full items-center justify-center gap-3 rounded-xl border border-line bg-paper py-3.5 font-semibold text-ink transition hover:bg-cream"
+      >
+        <GoogleIcon />
+        Continue with Google
+      </button>
+      {error && <p className="mt-3 text-sm text-terracotta-dark">{error}</p>}
     </div>
   );
 }
