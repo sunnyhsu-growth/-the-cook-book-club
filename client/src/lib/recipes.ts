@@ -83,6 +83,7 @@ export async function createRecipe(
       category: draft.category || null,
       tags: draft.tags,
       notes: draft.notes,
+      contributor: draft.contributor.trim() || null,
       image_url: imageUrl,
       source_image_url: sourceImageUrl,
       status: 'published',
@@ -111,6 +112,7 @@ export async function updateRecipe(
       category: draft.category || null,
       tags: draft.tags,
       notes: draft.notes,
+      contributor: draft.contributor.trim() || null,
       image_url: imageUrl,
     })
     .eq('id', id)

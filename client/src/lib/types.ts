@@ -15,6 +15,7 @@ export interface RecipeDraft {
   category: string;
   tags: string[];
   notes: string;
+  contributor: string;
 }
 
 // A persisted recipe row from Supabase.
@@ -39,5 +40,6 @@ export function emptyDraft(): RecipeDraft {
     category: '',
     tags: [],
     notes: '',
+    contributor: '',
   };
 }

@@ -104,6 +104,12 @@ export default function RecipeDetail() {
           {recipe.description && (
             <p className="mt-2 text-muted">{recipe.description}</p>
           )}
+          {recipe.contributor && (
+            <p className="mt-2 text-sm text-muted">
+              Contributed by{' '}
+              <span className="font-semibold text-terracotta-dark">{recipe.contributor}</span>
+            </p>
+          )}
         </div>
         {isOwner && (
           <div className="flex shrink-0 gap-2">

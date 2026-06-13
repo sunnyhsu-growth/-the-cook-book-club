@@ -45,6 +45,9 @@ export default function RecipeCard({ recipe }: { recipe: Recipe }) {
             </span>
           ))}
         </div>
+        {recipe.contributor && (
+          <p className="pt-1 text-xs italic text-muted">by {recipe.contributor}</p>
+        )}
       </div>
     </Link>
   );

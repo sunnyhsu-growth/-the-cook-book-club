@@ -17,6 +17,7 @@ create table if not exists public.recipes (
   category         text,                                   -- primary course (one per recipe)
   tags             text[] not null default '{}',          -- cuisine + dietary
   notes            text default '',                        -- source, tips, variations
+  contributor      text,                                   -- who added the recipe
   image_url        text,                                   -- finished dish photo
   source_image_url text,                                   -- original captured photo
   status           text not null default 'published',      -- reserved for moderation
@@ -37,7 +38,8 @@ begin
     || setweight(to_tsvector('english', coalesce(new.description, '')), 'B')
     || setweight(to_tsvector('english', coalesce(new.ingredients::text, '')), 'B')
     || setweight(to_tsvector('english', coalesce(new.steps::text, '')), 'C')
-    || setweight(to_tsvector('english', coalesce(new.notes, '')), 'C');
+    || setweight(to_tsvector('english', coalesce(new.notes, '')), 'C')
+    || setweight(to_tsvector('english', coalesce(new.contributor, '')), 'B');
   return new;
 end;
 $$;

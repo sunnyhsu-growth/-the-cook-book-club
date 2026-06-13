@@ -80,6 +80,7 @@ export default function AddRecipe() {
         category: r.category ?? '',
         tags: r.tags ?? [],
         notes: r.notes ?? '',
+        contributor: r.contributor ?? '',
       });
       setExistingImageUrl(r.image_url);
     });
@@ -100,6 +101,10 @@ export default function AddRecipe() {
       // Ensure at least one empty row so the form is editable.
       if (!result.ingredients?.length) result.ingredients = [{ quantity: '', item: '' }];
       if (!result.steps?.length) result.steps = [''];
+      // The contributor is the person adding it, not from the recipe — prefill with
+      // their account name (editable in the form).
+      result.contributor =
+        (user?.user_metadata?.full_name as string) || user?.email?.split('@')[0] || '';
       setDraft(result);
       setMode('form');
     } catch (e: any) {

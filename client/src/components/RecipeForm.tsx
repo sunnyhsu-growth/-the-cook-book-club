@@ -86,6 +86,19 @@ export default function RecipeForm({
         </select>
       </div>
 
+      {/* contributor */}
+      <div>
+        <label className="mb-1.5 block text-sm font-semibold text-muted">
+          Contributed by
+        </label>
+        <input
+          value={draft.contributor}
+          onChange={(e) => set({ contributor: e.target.value })}
+          placeholder="Your name"
+          className="w-full rounded-xl border border-line bg-paper px-3 py-2.5 outline-none focus:border-terracotta"
+        />
+      </div>
+
       {/* times + servings */}
       <div className="grid grid-cols-3 gap-3">
         {[
