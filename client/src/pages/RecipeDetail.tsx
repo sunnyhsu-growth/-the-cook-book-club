@@ -18,7 +18,7 @@ import type { Recipe } from '../lib/types';
 import { useAuth } from '../context/AuthContext';
 import { isAdmin } from '../lib/admin';
 import { youtubeEmbedUrl, youtubeSearchUrl } from '../lib/youtube';
-import { groceryMapsUrl } from '../lib/maps';
+import { ingredientMapsUrl } from '../lib/maps';
 import { ScallopFrame } from '../components/Doodles';
 
 export default function RecipeDetail() {
@@ -169,22 +169,29 @@ export default function RecipeDetail() {
           <h2 className="font-display text-2xl font-semibold">Ingredients</h2>
           <ul className="mt-4 space-y-2.5">
             {recipe.ingredients?.map((ing, i) => (
-              <li key={i} className="flex gap-2 border-b border-line pb-2.5 text-sm">
+              <li key={i} className="flex items-center gap-2 border-b border-line pb-2.5 text-sm">
                 {ing.quantity && (
                   <span className="font-semibold text-terracotta">{ing.quantity}</span>
                 )}
                 <span>{ing.item}</span>
+                {ing.item && (
+                  <a
+                    href={ingredientMapsUrl(ing.item)}
+                    target="_blank"
+                    rel="noreferrer"
+                    title={`Find ${ing.item} nearby`}
+                    aria-label={`Find ${ing.item} nearby`}
+                    className="ml-auto shrink-0 text-line transition hover:text-terracotta"
+                  >
+                    <MapPin size={14} />
+                  </a>
+                )}
               </li>
             ))}
           </ul>
-          <a
-            href={groceryMapsUrl(recipe.tags)}
-            target="_blank"
-            rel="noreferrer"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-terracotta/50 px-4 py-2 text-sm font-semibold text-terracotta-dark transition hover:bg-blush"
-          >
-            <MapPin size={15} /> Find ingredients near you
-          </a>
+          <p className="mt-3 text-xs text-muted">
+            Tap a <MapPin size={11} className="inline" /> to find that ingredient nearby.
+          </p>
         </section>
 
         {/* steps */}

@@ -18,3 +18,10 @@ export function groceryMapsUrl(tags: string[]): string {
     `${groceryQuery(tags)} near me`,
   )}`;
 }
+
+// Find where to buy a single ingredient nearby.
+export function ingredientMapsUrl(item: string): string {
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+    `${item} near me`,
+  )}`;
+}
