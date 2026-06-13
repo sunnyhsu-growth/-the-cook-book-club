@@ -72,10 +72,10 @@ create policy "Users can insert their own recipes"
 drop policy if exists "Users can update their own recipes" on public.recipes;
 create policy "Users can update their own recipes"
   on public.recipes for update
-  using (auth.uid() = user_id or lower(auth.jwt()->>'email') = 'sunny_hsu@berkeley.edu')
-  with check (auth.uid() = user_id or lower(auth.jwt()->>'email') = 'sunny_hsu@berkeley.edu');
+  using (auth.uid() = user_id or lower(auth.jwt()->>'email') in ('sunny_hsu@berkeley.edu', 'yentingsunny@gmail.com'))
+  with check (auth.uid() = user_id or lower(auth.jwt()->>'email') in ('sunny_hsu@berkeley.edu', 'yentingsunny@gmail.com'));
 
 drop policy if exists "Users can delete their own recipes" on public.recipes;
 create policy "Users can delete their own recipes"
   on public.recipes for delete
-  using (auth.uid() = user_id or lower(auth.jwt()->>'email') = 'sunny_hsu@berkeley.edu');
+  using (auth.uid() = user_id or lower(auth.jwt()->>'email') in ('sunny_hsu@berkeley.edu', 'yentingsunny@gmail.com'));
