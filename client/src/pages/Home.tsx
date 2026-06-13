@@ -59,23 +59,30 @@ export default function Home() {
 
   return (
     <div className="relative overflow-hidden">
-      {/* hand-drawn doodles scattered across the whole page */}
+      {/* hand-drawn doodles scattered across the page, gently floating */}
       <div className="pointer-events-none absolute inset-0 text-terracotta/80" aria-hidden="true">
-        <Strawberry className="absolute left-[5%] top-[2%] h-16 w-16 -rotate-12" />
-        <Lemon className="absolute right-[6%] top-[3%] h-16 w-16 rotate-6" />
-        <Whisk className="absolute left-[14%] top-[12%] hidden h-16 w-16 -rotate-6 sm:block" />
-        <ForkKnife className="absolute right-[15%] top-[11%] hidden h-16 w-16 rotate-12 sm:block" />
-        <Herb className="absolute left-[2%] top-[22%] h-16 w-16" />
-        <CitrusHalf className="absolute right-[3%] top-[24%] hidden h-16 w-16 md:block" />
-        <PeaPod className="absolute left-[6%] top-[42%] hidden h-20 w-20 -rotate-6 md:block" />
-        <Sparkle className="absolute right-[11%] top-[40%] hidden h-12 w-12 sm:block" />
-        <Strawberry className="absolute right-[4%] top-[56%] h-16 w-16 rotate-6" />
-        <Lemon className="absolute left-[3%] top-[58%] hidden h-16 w-16 -rotate-12 sm:block" />
-        <Whisk className="absolute right-[7%] top-[72%] hidden h-20 w-20 rotate-6 md:block" />
-        <Herb className="absolute left-[5%] top-[76%] h-16 w-16 -rotate-6" />
-        <CitrusHalf className="absolute left-[24%] top-[90%] hidden h-14 w-14 lg:block" />
-        <ForkKnife className="absolute right-[22%] top-[92%] hidden h-16 w-16 -rotate-12 lg:block" />
-        <Sparkle className="absolute left-[46%] top-[88%] hidden h-10 w-10 lg:block" />
+        <Strawberry className="float1 absolute left-[5%] top-[2%] h-16 w-16 -rotate-12" />
+        <Lemon className="float2 absolute right-[6%] top-[3%] h-16 w-16 rotate-6" />
+        <Sparkle className="float3 absolute left-[27%] top-[5%] hidden h-9 w-9 md:block" />
+        <Whisk className="float4 absolute left-[13%] top-[12%] hidden h-16 w-16 -rotate-6 sm:block" />
+        <ForkKnife className="float5 absolute right-[15%] top-[11%] hidden h-16 w-16 rotate-12 sm:block" />
+        <Sparkle className="float2 absolute right-[30%] top-[18%] hidden h-7 w-7 lg:block" />
+        <Herb className="float3 absolute left-[2%] top-[22%] h-16 w-16" />
+        <CitrusHalf className="float1 absolute right-[3%] top-[24%] hidden h-16 w-16 md:block" />
+        <PeaPod className="float5 absolute left-[6%] top-[40%] hidden h-20 w-20 -rotate-6 md:block" />
+        <Sparkle className="float4 absolute right-[11%] top-[38%] hidden h-12 w-12 sm:block" />
+        <CitrusHalf className="float2 absolute right-[26%] top-[52%] hidden h-12 w-12 lg:block" />
+        <Strawberry className="float3 absolute right-[4%] top-[54%] h-16 w-16 rotate-6" />
+        <Lemon className="float4 absolute left-[3%] top-[56%] hidden h-16 w-16 -rotate-12 sm:block" />
+        <PeaPod className="float1 absolute left-[19%] top-[64%] hidden h-14 w-14 rotate-12 lg:block" />
+        <Herb className="float2 absolute right-[2%] top-[66%] hidden h-14 w-14 lg:block" />
+        <Whisk className="float5 absolute right-[7%] top-[74%] hidden h-20 w-20 rotate-6 md:block" />
+        <Herb className="float3 absolute left-[5%] top-[76%] h-16 w-16 -rotate-6" />
+        <ForkKnife className="float4 absolute left-[3%] top-[88%] hidden h-16 w-16 -rotate-6 lg:block" />
+        <CitrusHalf className="float1 absolute left-[25%] top-[90%] hidden h-14 w-14 lg:block" />
+        <Sparkle className="float5 absolute left-[46%] top-[86%] hidden h-9 w-9 md:block" />
+        <Strawberry className="float2 absolute right-[21%] top-[90%] hidden h-14 w-14 rotate-6 lg:block" />
+        <Lemon className="float3 absolute right-[5%] top-[88%] h-12 w-12 -rotate-6" />
       </div>
 
       <div className="relative z-10">

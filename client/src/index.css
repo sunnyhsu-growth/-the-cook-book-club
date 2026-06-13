@@ -47,3 +47,29 @@ h3,
   font-size: 0.72rem;
   color: var(--color-terracotta);
 }
+
+/* ─── Gently floating doodles ──────────────────────────────────────────────
+   Animate the independent `translate` property so it composes with each
+   doodle's Tailwind rotation. Varied durations/delays keep them out of sync. */
+@keyframes floatY {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -14px; }
+}
+@keyframes floatYDown {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 12px; }
+}
+@keyframes floatDiag {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 9px -9px; }
+}
+
+.float1 { animation: floatY 6s ease-in-out infinite; }
+.float2 { animation: floatYDown 8s ease-in-out infinite; animation-delay: -2s; }
+.float3 { animation: floatDiag 7s ease-in-out infinite; animation-delay: -3s; }
+.float4 { animation: floatY 9s ease-in-out infinite; animation-delay: -1.5s; }
+.float5 { animation: floatDiag 11s ease-in-out infinite; animation-delay: -4s; }
+
+@media (prefers-reduced-motion: reduce) {
+  .float1, .float2, .float3, .float4, .float5 { animation: none; }
+}
