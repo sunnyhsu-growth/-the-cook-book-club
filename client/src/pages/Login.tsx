@@ -43,7 +43,7 @@ export default function Login() {
       <p className="eyebrow">The Cook Book Club</p>
       <h1 className="mt-2 font-display text-4xl font-bold">Welcome in</h1>
       <p className="mt-2 text-center text-muted">
-        Sign in to add recipes. Browsing is open to everyone — no account needed.
+        Sign in to browse the collection and add your own recipes.
       </p>
 
       {sent ? (

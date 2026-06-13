@@ -21,7 +21,14 @@ export default function App() {
       <main className="flex-1">
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/recipe/:id" element={<RecipeDetail />} />
+          <Route
+            path="/recipe/:id"
+            element={
+              <RequireAuth>
+                <RecipeDetail />
+              </RequireAuth>
+            }
+          />
           <Route
             path="/add"
             element={
