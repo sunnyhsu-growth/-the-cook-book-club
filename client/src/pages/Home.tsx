@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Loader2, UtensilsCrossed, Plus } from 'lucide-react';
+import { Loader2, UtensilsCrossed, Plus, LogIn } from 'lucide-react';
 import { listRecipes, listAllTags } from '../lib/recipes';
 import type { Recipe } from '../lib/types';
 import { useAuth } from '../context/AuthContext';
 import RecipeCard from '../components/RecipeCard';
 import SearchBar from '../components/SearchBar';
 import TagFilter from '../components/TagFilter';
-import LandingCover from '../components/LandingCover';
 import {
   Strawberry,
   Lemon,
@@ -57,21 +56,9 @@ export default function Home() {
     };
   }, [user, search, activeTag]);
 
-  if (authLoading) {
-    return (
-      <div className="grid min-h-[60vh] place-items-center text-muted">
-        <Loader2 className="animate-spin" />
-      </div>
-    );
-  }
-
-  // Signed-out visitors see the cookbook-cover landing, no recipes.
-  if (!user) return <LandingCover />;
-
-  // Signed-in: the searchable gallery.
   return (
     <div className="relative overflow-hidden">
-      {/* hand-drawn doodles scattered across the page */}
+      {/* hand-drawn doodles scattered across the whole page */}
       <div className="pointer-events-none absolute inset-0 text-terracotta/80" aria-hidden="true">
         <Strawberry className="absolute left-[5%] top-[2%] h-16 w-16 -rotate-12" />
         <Lemon className="absolute right-[6%] top-[3%] h-16 w-16 rotate-6" />
@@ -91,7 +78,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        {/* hero */}
+        {/* hero — the family-cookbook cover (shown to everyone) */}
         <section className="mx-auto max-w-5xl px-4 pb-4 pt-12 text-center">
           <p className="eyebrow">Gather · Cook · Share</p>
           <h1 className="mt-3 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl">
@@ -107,50 +94,71 @@ export default function Home() {
           </p>
         </section>
 
-        <div className="mx-auto max-w-5xl px-4 py-6">
-          <div className="mx-auto max-w-xl">
-            <SearchBar value={search} onChange={setSearch} />
+        {authLoading ? (
+          <div className="grid place-items-center py-20 text-muted">
+            <Loader2 className="animate-spin" />
           </div>
-          <div className="mt-4 flex justify-center">
-            <TagFilter tags={tags} active={activeTag} onSelect={setActiveTag} />
+        ) : !user ? (
+          /* ── signed-out landing: invite to sign in, no recipes shown ── */
+          <div className="mx-auto max-w-md px-4 pb-24 pt-2 text-center">
+            <Link
+              to="/login"
+              className="inline-flex items-center gap-2 rounded-full bg-terracotta px-7 py-3.5 text-lg font-semibold text-paper shadow-sm transition hover:bg-terracotta-dark"
+            >
+              <LogIn size={18} /> Sign in to explore
+            </Link>
+            <p className="mt-3 text-sm text-muted">
+              Our recipe collection is members-only — sign in to browse every dish and add
+              your own.
+            </p>
           </div>
-
-          {error && <p className="mt-6 text-center text-terracotta-dark">{error}</p>}
-
-          {loading ? (
-            <div className="grid place-items-center py-24 text-muted">
-              <Loader2 className="animate-spin" />
+        ) : (
+          /* ── signed-in: the searchable gallery ── */
+          <div className="mx-auto max-w-5xl px-4 py-6">
+            <div className="mx-auto max-w-xl">
+              <SearchBar value={search} onChange={setSearch} />
             </div>
-          ) : recipes.length === 0 ? (
-            <ScallopFrame className="mx-auto mt-10 max-w-md p-3">
-              <div className="rounded-2xl bg-paper p-10 text-center">
-                <UtensilsCrossed className="mx-auto text-line" size={40} />
-                <p className="mt-4 font-display text-xl">No recipes yet</p>
-                <p className="mt-1 text-sm text-muted">
-                  {search || activeTag
-                    ? 'Try a different search or tag.'
-                    : 'Be the first to add one.'}
-                </p>
-                {!search && !activeTag && (
-                  <Link
-                    to="/add"
-                    className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-terracotta px-5 py-2.5 font-semibold text-paper hover:bg-terracotta-dark"
-                  >
-                    <Plus size={16} /> Add a recipe
-                  </Link>
-                )}
+            <div className="mt-4 flex justify-center">
+              <TagFilter tags={tags} active={activeTag} onSelect={setActiveTag} />
+            </div>
+
+            {error && <p className="mt-6 text-center text-terracotta-dark">{error}</p>}
+
+            {loading ? (
+              <div className="grid place-items-center py-24 text-muted">
+                <Loader2 className="animate-spin" />
               </div>
-            </ScallopFrame>
-          ) : (
-            <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {recipes.map((r) => (
-                <ScallopFrame key={r.id} className="p-2.5">
-                  <RecipeCard recipe={r} />
-                </ScallopFrame>
-              ))}
-            </div>
-          )}
-        </div>
+            ) : recipes.length === 0 ? (
+              <ScallopFrame className="mx-auto mt-10 max-w-md p-3">
+                <div className="rounded-2xl bg-paper p-10 text-center">
+                  <UtensilsCrossed className="mx-auto text-line" size={40} />
+                  <p className="mt-4 font-display text-xl">No recipes yet</p>
+                  <p className="mt-1 text-sm text-muted">
+                    {search || activeTag
+                      ? 'Try a different search or tag.'
+                      : 'Be the first to add one.'}
+                  </p>
+                  {!search && !activeTag && (
+                    <Link
+                      to="/add"
+                      className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-terracotta px-5 py-2.5 font-semibold text-paper hover:bg-terracotta-dark"
+                    >
+                      <Plus size={16} /> Add a recipe
+                    </Link>
+                  )}
+                </div>
+              </ScallopFrame>
+            ) : (
+              <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                {recipes.map((r) => (
+                  <ScallopFrame key={r.id} className="p-2.5">
+                    <RecipeCard recipe={r} />
+                  </ScallopFrame>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
