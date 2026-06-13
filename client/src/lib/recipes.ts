@@ -20,13 +20,11 @@ export async function uploadImage(
 }
 
 // ─── CRUD ──────────────────────────────────────────────────────────────────--
-export interface FacetSelection {
-  group: Facet;
-  value: string;
-}
+// One optional selection per facet group; set facets combine with AND.
+export type FacetSelections = Partial<Record<Facet, string>>;
 export interface RecipeFilters {
   search?: string;
-  facet?: FacetSelection;
+  facets?: FacetSelections;
 }
 
 export async function listRecipes(filters: RecipeFilters = {}): Promise<Recipe[]> {
@@ -36,12 +34,12 @@ export async function listRecipes(filters: RecipeFilters = {}): Promise<Recipe[]
     .eq('status', 'published')
     .order('created_at', { ascending: false });
 
-  if (filters.facet) {
-    const { group, value } = filters.facet;
-    // Course is the primary `category` column; cuisine/dietary live in `tags`.
-    if (group === 'course') query = query.eq('category', value);
-    else query = query.contains('tags', [value]);
-  }
+  const f = filters.facets ?? {};
+  // Course is the primary `category` column; cuisine/dietary live in `tags`.
+  if (f.course) query = query.eq('category', f.course);
+  if (f.cuisine) query = query.contains('tags', [f.cuisine]);
+  if (f.dietary) query = query.contains('tags', [f.dietary]);
+
   if (filters.search?.trim()) {
     // websearch_to_tsquery handles natural phrases & multiple ingredients.
     query = query.textSearch('search_tsv', filters.search.trim(), {

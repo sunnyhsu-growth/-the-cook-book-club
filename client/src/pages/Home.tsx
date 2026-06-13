@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, UtensilsCrossed, Plus, LogIn } from 'lucide-react';
-import { listRecipes, listFacets, type Facets, type FacetSelection } from '../lib/recipes';
+import { listRecipes, listFacets, type Facets, type FacetSelections } from '../lib/recipes';
 import type { Recipe } from '../lib/types';
 import { COURSES, UNCATEGORIZED } from '../lib/taxonomy';
 import { useAuth } from '../context/AuthContext';
@@ -29,7 +29,7 @@ export default function Home() {
   const [recipes, setRecipes] = useState<Recipe[]>([]);
   const [facets, setFacets] = useState<Facets>(EMPTY_FACETS);
   const [search, setSearch] = useState('');
-  const [active, setActive] = useState<FacetSelection | null>(null);
+  const [facetSel, setFacetSel] = useState<FacetSelections>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -46,7 +46,7 @@ export default function Home() {
     let cancelled = false;
     setLoading(true);
     const t = setTimeout(() => {
-      listRecipes({ search, facet: active ?? undefined })
+      listRecipes({ search, facets: facetSel })
         .then((data) => {
           if (!cancelled) setRecipes(data);
         })
@@ -57,10 +57,11 @@ export default function Home() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [user, search, active]);
+  }, [user, search, facetSel]);
 
   // When nothing is filtered, browse the collection in course sections.
-  const showSections = !active && !search.trim();
+  const hasFilters = Object.keys(facetSel).length > 0;
+  const showSections = !hasFilters && !search.trim();
   const sections = showSections
     ? [...COURSES, UNCATEGORIZED]
         .map((course) => ({
@@ -151,7 +152,7 @@ export default function Home() {
               <SearchBar value={search} onChange={setSearch} />
             </div>
             <div className="mt-5">
-              <TagFilter facets={facets} active={active} onSelect={setActive} />
+              <TagFilter facets={facets} active={facetSel} onChange={setFacetSel} />
             </div>
 
             {error && <p className="mt-6 text-center text-terracotta-dark">{error}</p>}
@@ -166,11 +167,11 @@ export default function Home() {
                   <UtensilsCrossed className="mx-auto text-line" size={40} />
                   <p className="mt-4 font-display text-xl">No recipes yet</p>
                   <p className="mt-1 text-sm text-muted">
-                    {active || search
+                    {hasFilters || search
                       ? 'Try a different search or filter.'
                       : 'Be the first to add one.'}
                   </p>
-                  {!active && !search && (
+                  {!hasFilters && !search && (
                     <Link
                       to="/add"
                       className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-terracotta px-5 py-2.5 font-semibold text-paper hover:bg-terracotta-dark"
