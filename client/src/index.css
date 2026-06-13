@@ -1,0 +1,49 @@
+@import "tailwindcss";
+
+/* ─── The Cook Book Club — warm family-cookbook theme ──────────────────────── */
+@theme {
+  --color-cream: #f4eee1;       /* warm paper background */
+  --color-paper: #fffdf6;       /* cards / surfaces */
+  --color-ink: #2b2521;         /* near-black warm text */
+  --color-muted: #94887a;       /* secondary text */
+  --color-terracotta: #c8402e;  /* the signature poppy red (accents) */
+  --color-terracotta-dark: #a62d1e;
+  --color-blush: #efd9d2;        /* soft red tint for chips/fills */
+  --color-amber: #e0a458;
+  --color-sage: #8a9a7b;
+  --color-line: #e3d8c4;         /* hairlines on cream */
+
+  --font-display: "Playfair Display", Georgia, "Times New Roman", serif;
+  --font-sans: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* small uppercase letter-spaced label, like "THE DAVIES FAMILY" */
+.eyebrow {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  font-weight: 700;
+  font-size: 0.72rem;
+  color: var(--color-terracotta);
+}
