@@ -18,6 +18,7 @@ create table if not exists public.recipes (
   tags             text[] not null default '{}',          -- cuisine + dietary
   notes            text default '',                        -- source, tips, variations
   contributor      text,                                   -- who added the recipe
+  video_url        text,                                   -- author's how-to video (YouTube)
   image_url        text,                                   -- finished dish photo
   source_image_url text,                                   -- original captured photo
   status           text not null default 'published',      -- reserved for moderation

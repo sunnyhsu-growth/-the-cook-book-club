@@ -99,6 +99,24 @@ export default function RecipeForm({
         />
       </div>
 
+      {/* how-to video */}
+      <div>
+        <label className="mb-1.5 block text-sm font-semibold text-muted">
+          How-to video{' '}
+          <span className="font-normal text-muted/70">— YouTube link (optional)</span>
+        </label>
+        <input
+          type="url"
+          value={draft.video_url}
+          onChange={(e) => set({ video_url: e.target.value })}
+          placeholder="https://youtube.com/watch?v=…"
+          className="w-full rounded-xl border border-line bg-paper px-3 py-2.5 outline-none focus:border-terracotta"
+        />
+        <p className="mt-1 text-xs text-muted">
+          Leave blank and we'll link the closest cooking videos on YouTube.
+        </p>
+      </div>
+
       {/* times + servings */}
       <div className="grid grid-cols-3 gap-3">
         {[

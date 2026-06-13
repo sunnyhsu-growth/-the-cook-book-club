@@ -9,12 +9,14 @@ import {
   ArrowLeft,
   Loader2,
   UtensilsCrossed,
+  Play,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { getRecipe, deleteRecipe } from '../lib/recipes';
 import type { Recipe } from '../lib/types';
 import { useAuth } from '../context/AuthContext';
 import { isAdmin } from '../lib/admin';
+import { youtubeEmbedUrl, youtubeSearchUrl } from '../lib/youtube';
 import { ScallopFrame } from '../components/Doodles';
 
 export default function RecipeDetail() {
@@ -190,6 +192,55 @@ export default function RecipeDetail() {
           </ol>
         </section>
       </div>
+
+      {/* how-to video */}
+      <section className="mt-10">
+        <h2 className="font-display text-2xl font-bold">How to cook it</h2>
+        {(() => {
+          const embed = recipe.video_url ? youtubeEmbedUrl(recipe.video_url) : null;
+          if (embed) {
+            return (
+              <div className="mt-4 aspect-video overflow-hidden rounded-2xl border border-line">
+                <iframe
+                  src={embed}
+                  title="How-to video"
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            );
+          }
+          if (recipe.video_url) {
+            return (
+              <a
+                href={recipe.video_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-4 inline-flex items-center gap-2 rounded-full bg-terracotta px-5 py-2.5 font-semibold text-paper hover:bg-terracotta-dark"
+              >
+                <Play size={16} /> Watch the video
+              </a>
+            );
+          }
+          return (
+            <div className="mt-3">
+              <a
+                href={youtubeSearchUrl(recipe.title)}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full bg-terracotta px-5 py-2.5 font-semibold text-paper hover:bg-terracotta-dark"
+              >
+                <Play size={16} /> Watch how to make it
+              </a>
+              <p className="mt-2 text-xs text-muted">
+                No video added by the author — these are the closest cooking videos we
+                could find on YouTube.
+              </p>
+            </div>
+          );
+        })()}
+      </section>
 
       {recipe.notes && (
         <section className="mt-10 rounded-2xl border border-line bg-paper p-6">

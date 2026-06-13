@@ -82,6 +82,7 @@ export default function AddRecipe() {
         tags: r.tags ?? [],
         notes: r.notes ?? '',
         contributor: r.contributor ?? '',
+        video_url: r.video_url ?? '',
       });
       setExistingImageUrl(r.image_url);
     });
@@ -106,6 +107,7 @@ export default function AddRecipe() {
       // their account name (editable in the form).
       result.contributor =
         (user?.user_metadata?.full_name as string) || user?.email?.split('@')[0] || '';
+      result.video_url = result.video_url ?? '';
       setDraft(result);
       setMode('form');
     } catch (e: any) {
