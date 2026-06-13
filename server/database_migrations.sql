@@ -14,7 +14,8 @@ create table if not exists public.recipes (
   prep_minutes     int,
   cook_minutes     int,
   servings         int,
-  tags             text[] not null default '{}',          -- cuisine/meal/dietary
+  category         text,                                   -- primary course (one per recipe)
+  tags             text[] not null default '{}',          -- cuisine + dietary
   notes            text default '',                        -- source, tips, variations
   image_url        text,                                   -- finished dish photo
   source_image_url text,                                   -- original captured photo
@@ -31,6 +32,7 @@ returns trigger language plpgsql as $$
 begin
   new.search_tsv :=
       setweight(to_tsvector('english', coalesce(new.title, '')), 'A')
+    || setweight(to_tsvector('english', coalesce(new.category, '')), 'A')
     || setweight(to_tsvector('english', array_to_string(new.tags, ' ')), 'A')
     || setweight(to_tsvector('english', coalesce(new.description, '')), 'B')
     || setweight(to_tsvector('english', coalesce(new.ingredients::text, '')), 'B')

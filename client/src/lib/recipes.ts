@@ -1,5 +1,6 @@
 import { supabase } from './supabase';
 import type { Recipe, RecipeDraft } from './types';
+import { classifyTag, COURSES, type Facet } from './taxonomy';
 
 // ─── Storage ─────────────────────────────────────────────────────────────────
 export async function uploadImage(
@@ -19,9 +20,13 @@ export async function uploadImage(
 }
 
 // ─── CRUD ──────────────────────────────────────────────────────────────────--
+export interface FacetSelection {
+  group: Facet;
+  value: string;
+}
 export interface RecipeFilters {
   search?: string;
-  tag?: string;
+  facet?: FacetSelection;
 }
 
 export async function listRecipes(filters: RecipeFilters = {}): Promise<Recipe[]> {
@@ -31,7 +36,12 @@ export async function listRecipes(filters: RecipeFilters = {}): Promise<Recipe[]
     .eq('status', 'published')
     .order('created_at', { ascending: false });
 
-  if (filters.tag) query = query.contains('tags', [filters.tag]);
+  if (filters.facet) {
+    const { group, value } = filters.facet;
+    // Course is the primary `category` column; cuisine/dietary live in `tags`.
+    if (group === 'course') query = query.eq('category', value);
+    else query = query.contains('tags', [value]);
+  }
   if (filters.search?.trim()) {
     // websearch_to_tsquery handles natural phrases & multiple ingredients.
     query = query.textSearch('search_tsv', filters.search.trim(), {
@@ -72,6 +82,7 @@ export async function createRecipe(
       prep_minutes: draft.prep_minutes,
       cook_minutes: draft.cook_minutes,
       servings: draft.servings,
+      category: draft.category || null,
       tags: draft.tags,
       notes: draft.notes,
       image_url: imageUrl,
@@ -99,6 +110,7 @@ export async function updateRecipe(
       prep_minutes: draft.prep_minutes,
       cook_minutes: draft.cook_minutes,
       servings: draft.servings,
+      category: draft.category || null,
       tags: draft.tags,
       notes: draft.notes,
       image_url: imageUrl,
@@ -115,14 +127,36 @@ export async function deleteRecipe(id: string): Promise<void> {
   if (error) throw error;
 }
 
-// Distinct tags across all published recipes, for the filter bar.
-export async function listAllTags(): Promise<string[]> {
+export interface Facets {
+  courses: string[]; // ordered by COURSES
+  cuisines: string[];
+  dietary: string[];
+}
+
+// Distinct categories + tags actually present across published recipes, grouped
+// for the filter bar.
+export async function listFacets(): Promise<Facets> {
   const { data, error } = await supabase
     .from('recipes')
-    .select('tags')
+    .select('category, tags')
     .eq('status', 'published');
   if (error) throw error;
-  const set = new Set<string>();
-  (data ?? []).forEach((r: { tags: string[] }) => r.tags?.forEach((t) => set.add(t)));
-  return [...set].sort();
+
+  const courseSet = new Set<string>();
+  const cuisineSet = new Set<string>();
+  const dietarySet = new Set<string>();
+  (data ?? []).forEach((r: { category: string | null; tags: string[] }) => {
+    if (r.category) courseSet.add(r.category);
+    r.tags?.forEach((t) => {
+      const g = classifyTag(t);
+      if (g === 'cuisine') cuisineSet.add(t);
+      else if (g === 'dietary') dietarySet.add(t);
+    });
+  });
+
+  return {
+    courses: COURSES.filter((c) => courseSet.has(c)),
+    cuisines: [...cuisineSet].sort(),
+    dietary: [...dietarySet].sort(),
+  };
 }

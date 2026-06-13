@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Loader2, UtensilsCrossed, Plus, LogIn } from 'lucide-react';
-import { listRecipes, listAllTags } from '../lib/recipes';
+import { listRecipes, listFacets, type Facets, type FacetSelection } from '../lib/recipes';
 import type { Recipe } from '../lib/types';
+import { COURSES, UNCATEGORIZED } from '../lib/taxonomy';
 import { useAuth } from '../context/AuthContext';
 import RecipeCard from '../components/RecipeCard';
 import SearchBar from '../components/SearchBar';
@@ -21,19 +22,20 @@ import {
   CookBook,
 } from '../components/Doodles';
 
+const EMPTY_FACETS: Facets = { courses: [], cuisines: [], dietary: [] };
+
 export default function Home() {
   const { user, loading: authLoading } = useAuth();
   const [recipes, setRecipes] = useState<Recipe[]>([]);
-  const [tags, setTags] = useState<string[]>([]);
+  const [facets, setFacets] = useState<Facets>(EMPTY_FACETS);
   const [search, setSearch] = useState('');
-  const [activeTag, setActiveTag] = useState<string | null>(null);
+  const [active, setActive] = useState<FacetSelection | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Only load (and reveal) recipes for signed-in users.
   useEffect(() => {
     if (!user) return;
-    listAllTags().then(setTags).catch(() => {});
+    listFacets().then(setFacets).catch(() => {});
   }, [user, recipes.length]);
 
   useEffect(() => {
@@ -44,7 +46,7 @@ export default function Home() {
     let cancelled = false;
     setLoading(true);
     const t = setTimeout(() => {
-      listRecipes({ search, tag: activeTag ?? undefined })
+      listRecipes({ search, facet: active ?? undefined })
         .then((data) => {
           if (!cancelled) setRecipes(data);
         })
@@ -55,7 +57,24 @@ export default function Home() {
       cancelled = true;
       clearTimeout(t);
     };
-  }, [user, search, activeTag]);
+  }, [user, search, active]);
+
+  // When nothing is filtered, browse the collection in course sections.
+  const showSections = !active && !search.trim();
+  const sections = showSections
+    ? [...COURSES, UNCATEGORIZED]
+        .map((course) => ({
+          course,
+          items: recipes.filter((r) => (r.category || UNCATEGORIZED) === course),
+        }))
+        .filter((s) => s.items.length > 0)
+    : [];
+
+  const renderCard = (r: Recipe) => (
+    <ScallopFrame key={r.id} className="p-2.5">
+      <RecipeCard recipe={r} />
+    </ScallopFrame>
+  );
 
   return (
     <div className="relative overflow-hidden">
@@ -86,7 +105,7 @@ export default function Home() {
       </div>
 
       <div className="relative z-10">
-        {/* hero — the family-cookbook cover (shown to everyone) */}
+        {/* hero — shown to everyone */}
         <section className="mx-auto max-w-5xl px-4 pb-4 pt-12 text-center">
           <p className="eyebrow">Gather · Cook · Share</p>
           <h1 className="mt-3 font-display text-5xl font-bold leading-[0.95] tracking-tight sm:text-6xl">
@@ -107,7 +126,7 @@ export default function Home() {
             <Loader2 className="animate-spin" />
           </div>
         ) : !user ? (
-          /* ── signed-out landing: a cute window + sign-in lower down ── */
+          /* signed-out landing: a cute window + sign-in lower down */
           <div className="mx-auto max-w-md px-4 pb-24 pt-2 text-center">
             <ScallopFrame className="mt-4 p-3">
               <div className="rounded-2xl bg-paper px-8 py-14 text-center">
@@ -118,7 +137,6 @@ export default function Home() {
                 </p>
               </div>
             </ScallopFrame>
-
             <Link
               to="/login"
               className="mt-12 inline-flex items-center gap-2 rounded-full bg-terracotta px-6 py-3 font-semibold text-paper shadow-sm transition hover:bg-terracotta-dark"
@@ -127,13 +145,13 @@ export default function Home() {
             </Link>
           </div>
         ) : (
-          /* ── signed-in: the searchable gallery ── */
+          /* signed-in: searchable, grouped, sectioned gallery */
           <div className="mx-auto max-w-5xl px-4 py-6">
             <div className="mx-auto max-w-xl">
               <SearchBar value={search} onChange={setSearch} />
             </div>
-            <div className="mt-4 flex justify-center">
-              <TagFilter tags={tags} active={activeTag} onSelect={setActiveTag} />
+            <div className="mt-5">
+              <TagFilter facets={facets} active={active} onSelect={setActive} />
             </div>
 
             {error && <p className="mt-6 text-center text-terracotta-dark">{error}</p>}
@@ -148,11 +166,11 @@ export default function Home() {
                   <UtensilsCrossed className="mx-auto text-line" size={40} />
                   <p className="mt-4 font-display text-xl">No recipes yet</p>
                   <p className="mt-1 text-sm text-muted">
-                    {search || activeTag
-                      ? 'Try a different search or tag.'
+                    {active || search
+                      ? 'Try a different search or filter.'
                       : 'Be the first to add one.'}
                   </p>
-                  {!search && !activeTag && (
+                  {!active && !search && (
                     <Link
                       to="/add"
                       className="mt-5 inline-flex items-center gap-1.5 rounded-full bg-terracotta px-5 py-2.5 font-semibold text-paper hover:bg-terracotta-dark"
@@ -162,13 +180,23 @@ export default function Home() {
                   )}
                 </div>
               </ScallopFrame>
+            ) : showSections ? (
+              <div className="mt-8 space-y-12">
+                {sections.map((s) => (
+                  <section key={s.course}>
+                    <h2 className="font-display text-2xl font-bold">{s.course}</h2>
+                    <div className="mt-3 h-2 w-24 text-terracotta">
+                      <WavyLine className="h-full w-full" />
+                    </div>
+                    <div className="mt-5 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {s.items.map(renderCard)}
+                    </div>
+                  </section>
+                ))}
+              </div>
             ) : (
               <div className="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {recipes.map((r) => (
-                  <ScallopFrame key={r.id} className="p-2.5">
-                    <RecipeCard recipe={r} />
-                  </ScallopFrame>
-                ))}
+                {recipes.map(renderCard)}
               </div>
             )}
           </div>

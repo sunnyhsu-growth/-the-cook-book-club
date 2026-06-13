@@ -1,5 +1,6 @@
 import { Plus, Trash2, X, ArrowUp, ArrowDown } from 'lucide-react';
 import type { RecipeDraft } from '../lib/types';
+import { COURSES, CUISINES, DIETARY } from '../lib/taxonomy';
 import ImageUpload from './ImageUpload';
 import { useState } from 'react';
 
@@ -63,6 +64,26 @@ export default function RecipeForm({
           placeholder="A short note about this recipe…"
           className="w-full rounded-xl border border-line bg-paper px-3 py-2.5 outline-none focus:border-terracotta"
         />
+      </div>
+
+      {/* category (primary course) */}
+      <div>
+        <label className="mb-1.5 block text-sm font-semibold text-muted">Category</label>
+        <select
+          required
+          value={draft.category}
+          onChange={(e) => set({ category: e.target.value })}
+          className="w-full rounded-xl border border-line bg-paper px-3 py-2.5 outline-none focus:border-terracotta"
+        >
+          <option value="" disabled>
+            Choose a category…
+          </option>
+          {COURSES.map((c) => (
+            <option key={c} value={c}>
+              {c}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* times + servings */}
@@ -202,7 +223,7 @@ export default function RecipeForm({
       {/* tags */}
       <div>
         <label className="mb-1.5 block text-sm font-semibold text-muted">
-          Tags (cuisine, meal, dietary)
+          Cuisine &amp; dietary tags
         </label>
         <div className="flex flex-wrap items-center gap-2">
           {draft.tags.map((tag) => (
@@ -233,6 +254,21 @@ export default function RecipeForm({
             placeholder="type & press Enter"
             className="min-w-[10rem] flex-1 rounded-lg border border-line bg-paper px-3 py-1.5 text-sm outline-none focus:border-terracotta"
           />
+        </div>
+        {/* quick-add from the curated lists, so tags stay consistent */}
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {[...CUISINES, ...DIETARY]
+            .filter((t) => !draft.tags.includes(t))
+            .map((t) => (
+              <button
+                key={t}
+                type="button"
+                onClick={() => set({ tags: [...draft.tags, t] })}
+                className="rounded-full border border-line px-2.5 py-0.5 text-xs capitalize text-muted transition hover:border-terracotta hover:text-terracotta"
+              >
+                + {t}
+              </button>
+            ))}
         </div>
       </div>
 

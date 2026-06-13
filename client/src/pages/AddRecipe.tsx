@@ -77,6 +77,7 @@ export default function AddRecipe() {
         prep_minutes: r.prep_minutes,
         cook_minutes: r.cook_minutes,
         servings: r.servings,
+        category: r.category ?? '',
         tags: r.tags ?? [],
         notes: r.notes ?? '',
       });

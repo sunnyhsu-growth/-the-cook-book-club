@@ -13,6 +13,28 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 // CLAUDE_MODEL=claude-sonnet-4-6 for a cheaper cost/quality balance.
 const MODEL = process.env.CLAUDE_MODEL || 'claude-opus-4-8';
 
+// Controlled taxonomy — keep in sync with client/src/lib/taxonomy.ts.
+const COURSES = [
+  'Breakfast',
+  'Mains',
+  'Soups & Salads',
+  'Sides',
+  'Appetizers & Snacks',
+  'Desserts',
+  'Baking',
+  'Drinks',
+  'Sauces & Basics',
+];
+const CUISINES = [
+  'italian', 'french', 'mexican', 'american', 'chinese', 'japanese', 'korean',
+  'thai', 'vietnamese', 'indian', 'middle eastern', 'mediterranean', 'greek',
+  'spanish', 'caribbean', 'other',
+];
+const DIETARY = [
+  'vegetarian', 'vegan', 'gluten-free', 'dairy-free', 'nut-free', 'low-carb',
+  'high-protein',
+];
+
 export const RecipeSchema = z.object({
   title: z.string(),
   description: z.string().default(''),
@@ -23,6 +45,7 @@ export const RecipeSchema = z.object({
   prep_minutes: z.number().int().nullable().default(null),
   cook_minutes: z.number().int().nullable().default(null),
   servings: z.number().int().nullable().default(null),
+  category: z.string().default(''),
   tags: z.array(z.string()).default([]),
   notes: z.string().default(''),
 });
@@ -80,14 +103,21 @@ const RECIPE_TOOL: Anthropic.Tool = {
           + 'present, otherwise estimate a reasonable serving count from the ingredient '
           + 'quantities and dish type. Do not leave this blank.',
       },
+      category: {
+        type: 'string',
+        enum: COURSES,
+        description:
+          'The single primary category/course for this recipe. Choose EXACTLY ONE that '
+          + 'best fits (e.g. a pasta entree -> "Mains"; a cake -> "Desserts" or "Baking"; '
+          + 'a cocktail -> "Drinks"). Required.',
+      },
       tags: {
         type: 'array',
         description:
-          'Lowercase tags. ALWAYS include: cuisine (e.g. italian, mexican), meal type '
-          + '(e.g. breakfast, dessert, dinner), and every dietary tag the ingredients '
-          + 'support (e.g. vegetarian, vegan, gluten-free, dairy-free, contains-nuts). '
-          + 'Be thorough with dietary tags, but only add one the ingredients actually justify.',
-        items: { type: 'string' },
+          'Cuisine and dietary tags, chosen ONLY from the allowed values (do not invent '
+          + 'new ones, and do not put the course/meal here — that goes in category). '
+          + 'Include the cuisine if clear, plus every dietary tag the ingredients support.',
+        items: { type: 'string', enum: [...CUISINES, ...DIETARY] },
       },
       notes: {
         type: 'string',
@@ -97,7 +127,7 @@ const RECIPE_TOOL: Anthropic.Tool = {
           + 'serving suggestions, and headnotes. Use "" only if there is truly none.',
       },
     },
-    required: ['title', 'ingredients', 'steps', 'servings'],
+    required: ['title', 'ingredients', 'steps', 'servings', 'category'],
   },
 };
 
@@ -127,9 +157,11 @@ const SYSTEM_PROMPT = [
   'Always fill these, inferring when the source does not state them:',
   '- servings: use the stated yield if present, otherwise ESTIMATE a reasonable number',
   '  from the ingredient quantities and dish type. Never leave servings blank.',
-  '- tags: always include cuisine, meal type, AND every dietary tag the ingredients',
-  '  support (vegetarian, vegan, gluten-free, dairy-free, contains-nuts, etc.). Be',
-  '  thorough with dietary tags, but only add one the ingredients actually justify.',
+  '- category: choose EXACTLY ONE primary course from the allowed list that best fits',
+  '  the dish. This is the section the recipe is filed under.',
+  '- tags: choose cuisine and dietary tags ONLY from the allowed values (never invent',
+  '  new ones; do NOT put the course/meal in tags). Include the cuisine when clear, plus',
+  '  every dietary tag the ingredients genuinely support.',
   '- notes: capture any extra context that is not an ingredient or step — source/',
   '  attribution, tips, variations, substitutions, storage or serving suggestions,',
   '  headnotes. Use "" only if there is truly none.',

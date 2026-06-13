@@ -12,6 +12,7 @@ export interface RecipeDraft {
   prep_minutes: number | null;
   cook_minutes: number | null;
   servings: number | null;
+  category: string;
   tags: string[];
   notes: string;
 }
@@ -35,6 +36,7 @@ export function emptyDraft(): RecipeDraft {
     prep_minutes: null,
     cook_minutes: null,
     servings: null,
+    category: '',
     tags: [],
     notes: '',
   };
