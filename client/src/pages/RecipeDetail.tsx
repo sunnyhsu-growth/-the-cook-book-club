@@ -10,6 +10,7 @@ import {
   Loader2,
   UtensilsCrossed,
   Play,
+  MapPin,
 } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { getRecipe, deleteRecipe } from '../lib/recipes';
@@ -17,6 +18,7 @@ import type { Recipe } from '../lib/types';
 import { useAuth } from '../context/AuthContext';
 import { isAdmin } from '../lib/admin';
 import { youtubeEmbedUrl, youtubeSearchUrl } from '../lib/youtube';
+import { groceryMapsUrl } from '../lib/maps';
 import { ScallopFrame } from '../components/Doodles';
 
 export default function RecipeDetail() {
@@ -175,6 +177,14 @@ export default function RecipeDetail() {
               </li>
             ))}
           </ul>
+          <a
+            href={groceryMapsUrl(recipe.tags)}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-terracotta/50 px-4 py-2 text-sm font-semibold text-terracotta-dark transition hover:bg-blush"
+          >
+            <MapPin size={15} /> Find ingredients near you
+          </a>
         </section>
 
         {/* steps */}
