@@ -6,6 +6,7 @@
   "description": "The Cook Book Club — recipe book with AI extraction",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
+    "@supabase/supabase-js": "^2.91.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

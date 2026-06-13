@@ -1,5 +1,6 @@
 import type { RecipeDraft } from './types';
 import { normalizeImageFile } from './image';
+import { supabase } from './supabase';
 
 // In dev, client/.env sets this to the local Express server (http://localhost:3001).
 // In production (Vercel), it's left unset → '' → same-origin calls to /api/extract,
@@ -22,9 +23,17 @@ function readFileAsBase64(file: File): Promise<{ media_type: string; data: strin
 }
 
 async function callExtract(body: unknown): Promise<RecipeDraft> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const res = await fetch(`${API_URL}/api/extract`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: {
+      'Content-Type': 'application/json',
+      ...(session?.access_token
+        ? { Authorization: `Bearer ${session.access_token}` }
+        : {}),
+    },
     body: JSON.stringify(body),
   });
   if (!res.ok) {

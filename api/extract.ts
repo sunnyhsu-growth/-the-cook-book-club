@@ -1,6 +1,13 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
 import Anthropic from '@anthropic-ai/sdk';
+import { createClient } from '@supabase/supabase-js';
 import { z } from 'zod';
+
+// Used to verify the caller is a signed-in user before spending Anthropic credits.
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const authClient =
+  supabaseUrl && supabaseAnonKey ? createClient(supabaseUrl, supabaseAnonKey) : null;
 
 // This file is the single source of truth for recipe extraction. It is the
 // production Vercel function AND is re-exported by the local Express dev server
@@ -237,6 +244,19 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  // Require a valid signed-in session — keeps the public URL from being used to
+  // spend Anthropic credits.
+  if (!authClient) {
+    return res.status(500).json({ error: 'Auth is not configured on the server.' });
+  }
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
+  const { data: userData, error: authErr } = await authClient.auth.getUser(token);
+  if (authErr || !userData?.user) {
+    return res.status(401).json({ error: 'Please sign in to extract recipes.' });
+  }
+
   try {
     const body = req.body ?? {};
     const { type } = body;
