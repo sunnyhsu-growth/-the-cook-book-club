@@ -134,7 +134,8 @@ export default function Home() {
                 <CookBook className="mx-auto h-14 w-14 text-terracotta" />
                 <p className="mt-4 font-display text-2xl">A members-only cookbook</p>
                 <p className="mt-1 text-sm text-muted">
-                  Recipes from our Berkeley community, kept for the people who cook them.
+                  Discover recipes, share your own favorites, and preserve the meals that
+                  bring our community together.
                 </p>
               </div>
             </ScallopFrame>
