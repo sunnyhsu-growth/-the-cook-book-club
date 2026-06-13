@@ -11,6 +11,7 @@ import {
 } from '../lib/recipes';
 import { emptyDraft, type RecipeDraft } from '../lib/types';
 import { useAuth } from '../context/AuthContext';
+import { isAdmin } from '../lib/admin';
 import RecipeForm from '../components/RecipeForm';
 
 type Mode = 'capture' | 'form';
@@ -65,7 +66,7 @@ export default function AddRecipe() {
         navigate('/');
         return;
       }
-      if (user && r.user_id !== user.id) {
+      if (user && r.user_id !== user.id && !isAdmin(user)) {
         navigate(`/recipe/${id}`);
         return;
       }

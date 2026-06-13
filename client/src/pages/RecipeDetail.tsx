@@ -14,6 +14,7 @@ import type { ReactNode } from 'react';
 import { getRecipe, deleteRecipe } from '../lib/recipes';
 import type { Recipe } from '../lib/types';
 import { useAuth } from '../context/AuthContext';
+import { isAdmin } from '../lib/admin';
 import { ScallopFrame } from '../components/Doodles';
 
 export default function RecipeDetail() {
@@ -47,7 +48,7 @@ export default function RecipeDetail() {
       </div>
     );
 
-  const isOwner = user?.id === recipe.user_id;
+  const canManage = user?.id === recipe.user_id || isAdmin(user);
   const meta = [
     recipe.prep_minutes != null && {
       icon: <Clock size={18} />,
@@ -111,7 +112,7 @@ export default function RecipeDetail() {
             </p>
           )}
         </div>
-        {isOwner && (
+        {canManage && (
           <div className="flex shrink-0 gap-2">
             <Link
               to={`/edit/${recipe.id}`}
