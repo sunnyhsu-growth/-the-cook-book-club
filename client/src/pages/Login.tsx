@@ -1,9 +1,14 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Mail, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../context/AuthContext';
 
 export default function Login() {
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -19,6 +24,19 @@ export default function Login() {
       options: { redirectTo: window.location.origin },
     });
     if (error) setError(error.message);
+  }
+
+  async function handlePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setBusy(true);
+    setError(null);
+    const res =
+      mode === 'signup'
+        ? await supabase.auth.signUp({ email, password })
+        : await supabase.auth.signInWithPassword({ email, password });
+    setBusy(false);
+    if (res.error) setError(res.error.message);
+    // On success the auth listener sets the user and the effect above redirects.
   }
 
   return (
@@ -37,7 +55,65 @@ export default function Login() {
         <GoogleIcon />
         Continue with Google
       </button>
-      {error && <p className="mt-3 text-sm text-terracotta-dark">{error}</p>}
+
+      <div className="my-5 flex w-full items-center gap-3 text-xs text-muted">
+        <span className="h-px flex-1 bg-line" />
+        or with email
+        <span className="h-px flex-1 bg-line" />
+      </div>
+
+      <form onSubmit={handlePassword} className="w-full space-y-3">
+        <div className="flex items-center gap-2 rounded-xl border border-line bg-paper px-3">
+          <Mail size={18} className="text-muted" />
+          <input
+            type="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="you@example.com"
+            autoComplete="email"
+            className="w-full bg-transparent py-3 outline-none"
+          />
+        </div>
+        <div className="flex items-center gap-2 rounded-xl border border-line bg-paper px-3">
+          <Lock size={18} className="text-muted" />
+          <input
+            type="password"
+            required
+            minLength={6}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Password (6+ characters)"
+            autoComplete={mode === 'signup' ? 'new-password' : 'current-password'}
+            className="w-full bg-transparent py-3 outline-none"
+          />
+        </div>
+        {error && <p className="text-sm text-terracotta-dark">{error}</p>}
+        <button
+          type="submit"
+          disabled={busy}
+          className="w-full rounded-xl bg-terracotta py-3 font-semibold text-paper transition hover:bg-terracotta-dark disabled:opacity-60"
+        >
+          {busy
+            ? 'Please wait…'
+            : mode === 'signup'
+              ? 'Create account'
+              : 'Sign in'}
+        </button>
+      </form>
+
+      <button
+        type="button"
+        onClick={() => {
+          setMode(mode === 'signup' ? 'signin' : 'signup');
+          setError(null);
+        }}
+        className="mt-4 text-sm text-muted hover:text-ink"
+      >
+        {mode === 'signup'
+          ? 'Already have an account? Sign in'
+          : 'New here? Create an account'}
+      </button>
     </div>
   );
 }
