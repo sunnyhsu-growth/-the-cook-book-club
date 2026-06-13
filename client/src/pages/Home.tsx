@@ -18,6 +18,7 @@ import {
   Herb,
   WavyLine,
   ScallopFrame,
+  CookBook,
 } from '../components/Doodles';
 
 export default function Home() {
@@ -99,18 +100,24 @@ export default function Home() {
             <Loader2 className="animate-spin" />
           </div>
         ) : !user ? (
-          /* ── signed-out landing: invite to sign in, no recipes shown ── */
+          /* ── signed-out landing: a cute window + sign-in lower down ── */
           <div className="mx-auto max-w-md px-4 pb-24 pt-2 text-center">
+            <ScallopFrame className="mt-4 p-3">
+              <div className="rounded-2xl bg-paper px-8 py-14 text-center">
+                <CookBook className="mx-auto h-14 w-14 text-terracotta" />
+                <p className="mt-4 font-display text-2xl">A members-only cookbook</p>
+                <p className="mt-1 text-sm text-muted">
+                  Recipes from our Berkeley community, kept for the people who cook them.
+                </p>
+              </div>
+            </ScallopFrame>
+
             <Link
               to="/login"
-              className="inline-flex items-center gap-2 rounded-full bg-terracotta px-7 py-3.5 text-lg font-semibold text-paper shadow-sm transition hover:bg-terracotta-dark"
+              className="mt-12 inline-flex items-center gap-2 rounded-full bg-terracotta px-6 py-3 font-semibold text-paper shadow-sm transition hover:bg-terracotta-dark"
             >
               <LogIn size={18} /> Sign in to explore
             </Link>
-            <p className="mt-3 text-sm text-muted">
-              Our recipe collection is members-only — sign in to browse every dish and add
-              your own.
-            </p>
           </div>
         ) : (
           /* ── signed-in: the searchable gallery ── */
