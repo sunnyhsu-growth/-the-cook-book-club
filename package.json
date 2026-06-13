@@ -2,6 +2,7 @@
   "name": "the-cook-book-club",
   "private": true,
   "version": "1.0.0",
+  "type": "module",
   "description": "The Cook Book Club — recipe book with AI extraction",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.71.2",
